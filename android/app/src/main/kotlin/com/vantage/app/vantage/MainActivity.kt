@@ -1,0 +1,5 @@
+package com.vantage.app.vantage
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

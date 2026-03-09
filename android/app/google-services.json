@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "100942407983",
+    "project_id": "vantage-d34a2",
+    "storage_bucket": "vantage-d34a2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:100942407983:android:60b5dd000a9631805399da",
+        "android_client_info": {
+          "package_name": "com.vantage.app.vantage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "100942407983-ghpsulnon9158bksco44ent8j23hkvgi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSaX4fakH7xJMrrxA3vwMfeGNWLJ5oUdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "100942407983-ghpsulnon9158bksco44ent8j23hkvgi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/api/auth_providers.dart';
 import '../../auth/domain/auth_models.dart';
 import '../../auth/presentation/login_screen.dart';
+import '../../finance/presentation/finance_screen.dart';
 
 class VantageDashboard extends ConsumerWidget {
   const VantageDashboard({super.key});
@@ -27,7 +28,7 @@ class VantageDashboard extends ConsumerWidget {
               ),
             ],
           ),
-          body: _buildBody(style),
+          body: _buildBody(style, context),
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -35,16 +36,16 @@ class VantageDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(DashboardStyle style) {
+  Widget _buildBody(DashboardStyle style, BuildContext context) {
     switch (style) {
-      case DashboardStyle.grid: return _buildGridView();
-      case DashboardStyle.cards: return _buildCardsView();
+      case DashboardStyle.grid: return _buildGridView(context);
+      case DashboardStyle.cards: return _buildCardsView(context);
       case DashboardStyle.timeline: return _buildTimelineView();
     }
   }
 
   // --- REUTILIZAMOS LAS VISTAS DEL PROTOTIPO ---
-  Widget _buildGridView() {
+  Widget _buildGridView(BuildContext context) {
     final modules = [
       {'name': 'Finanzas', 'icon': Icons.account_balance_wallet, 'color': Colors.teal},
       {'name': 'Tareas', 'icon': Icons.checklist, 'color': Colors.amber},
@@ -60,30 +61,40 @@ class VantageDashboard extends ConsumerWidget {
       itemCount: modules.length,
       itemBuilder: (context, i) {
         final m = modules[i];
-        return Container(
-          decoration: BoxDecoration(
-            color: (m['color'] as Color).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: (m['color'] as Color).withOpacity(0.3)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(m['icon'] as IconData, size: 40, color: m['color'] as Color),
-              const SizedBox(height: 12),
-              Text(m['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
-            ],
+        return InkWell(
+          onTap: () {
+            if (m['name'] == 'Finanzas') {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FinanceScreen()));
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: (m['color'] as Color).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: (m['color'] as Color).withOpacity(0.3)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(m['icon'] as IconData, size: 40, color: m['color'] as Color),
+                const SizedBox(height: 12),
+                Text(m['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildCardsView() {
+  Widget _buildCardsView(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        _infoCard('Finanzas', 'Balance: 1.250€', 'Nómina en 5 días', Icons.euro, Colors.teal),
+        InkWell(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FinanceScreen())),
+          child: _infoCard('Finanzas', 'Balance: 1.250€', 'Nómina en 5 días', Icons.euro, Colors.teal),
+        ),
         _infoCard('Próxima Tarea', 'Revisar motor de contexto', 'Prioridad Alta', Icons.task_alt, Colors.amber),
         _infoCard('Media', 'One Piece: Cap. 1090', 'Nuevo mañana', Icons.play_circle_outline, Colors.redAccent),
       ],

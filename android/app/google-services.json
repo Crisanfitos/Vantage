@@ -20,7 +20,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBSaX4fakH7xJMrrxA3vwMfeGNWLJ5oUdk"
+          "current_key": "AIzaSyBtceQ8Lpa8XSlpRNRh5JNhOnPQXb8G6aA"
         }
       ],
       "services": {
@@ -29,6 +29,13 @@
             {
               "client_id": "100942407983-ghpsulnon9158bksco44ent8j23hkvgi.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "100942407983-jk7aq1fenbfpk8c9mngbh61o6nhj2lcf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vantage.app.vantage"
+              }
             }
           ]
         }

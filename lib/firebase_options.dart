@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -50,7 +41,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBSaX4fakH7xJMrrxA3vwMfeGNWLJ5oUdk',
+    apiKey: 'AIzaSyBtceQ8Lpa8XSlpRNRh5JNhOnPQXb8G6aA',
     appId: '1:100942407983:android:60b5dd000a9631805399da',
     messagingSenderId: '100942407983',
     projectId: 'vantage-d34a2',
@@ -66,4 +57,35 @@ class DefaultFirebaseOptions {
     iosClientId: '100942407983-jk7aq1fenbfpk8c9mngbh61o6nhj2lcf.apps.googleusercontent.com',
     iosBundleId: 'com.vantage.app.vantage',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCg6ylJ_venXgzxUVDjHW2gxwVrQ5Yy860',
+    appId: '1:100942407983:web:1a4aee31d03fa58f5399da',
+    messagingSenderId: '100942407983',
+    projectId: 'vantage-d34a2',
+    authDomain: 'vantage-d34a2.firebaseapp.com',
+    storageBucket: 'vantage-d34a2.firebasestorage.app',
+    measurementId: 'G-SY0DNVP33F',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB8H2A_MRcicfFxUKQno6-qGRjuMzUHTwE',
+    appId: '1:100942407983:ios:b79c0ad4c0deca6b5399da',
+    messagingSenderId: '100942407983',
+    projectId: 'vantage-d34a2',
+    storageBucket: 'vantage-d34a2.firebasestorage.app',
+    iosClientId: '100942407983-jk7aq1fenbfpk8c9mngbh61o6nhj2lcf.apps.googleusercontent.com',
+    iosBundleId: 'com.vantage.app.vantage',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCg6ylJ_venXgzxUVDjHW2gxwVrQ5Yy860',
+    appId: '1:100942407983:web:863a4c4c1ccbb5055399da',
+    messagingSenderId: '100942407983',
+    projectId: 'vantage-d34a2',
+    authDomain: 'vantage-d34a2.firebaseapp.com',
+    storageBucket: 'vantage-d34a2.firebasestorage.app',
+    measurementId: 'G-WCX5X59QWD',
+  );
+
 }

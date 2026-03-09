@@ -19,7 +19,7 @@ class EnvironmentsNotifier extends AutoDisposeNotifier<List<VantageEnvironment>>
     _subscription?.cancel();
     _subscription = ref
         .read(environmentRepositoryProvider)
-        .watchEnvironments(user.id)
+        .watchEnvironments(user.uid)
         .listen((envs) {
       state = envs;
     });
@@ -32,13 +32,13 @@ class EnvironmentsNotifier extends AutoDisposeNotifier<List<VantageEnvironment>>
   Future<void> addEnvironment(VantageEnvironment environment) async {
     final user = ref.read(authStateProvider).value;
     if (user == null) return;
-    await ref.read(environmentRepositoryProvider).saveEnvironment(user.id, environment);
+    await ref.read(environmentRepositoryProvider).saveEnvironment(user.uid, environment);
   }
 
   Future<void> removeEnvironment(String id) async {
     final user = ref.read(authStateProvider).value;
     if (user == null) return;
-    await ref.read(environmentRepositoryProvider).deleteEnvironment(user.id, id);
+    await ref.read(environmentRepositoryProvider).deleteEnvironment(user.uid, id);
   }
 }
 

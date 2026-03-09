@@ -1,3 +1,5 @@
+enum DashboardStyle { grid, cards, timeline }
+
 class VantageUser {
   final String id;
   final String email;
@@ -7,6 +9,7 @@ class VantageUser {
   final String? jobTitle;
   final String? photoUrl;
   final double? monthlySavingsGoal;
+  final DashboardStyle dashboardStyle; // Nueva preferencia
 
   VantageUser({
     required this.id,
@@ -17,6 +20,7 @@ class VantageUser {
     this.jobTitle,
     this.photoUrl,
     this.monthlySavingsGoal,
+    this.dashboardStyle = DashboardStyle.cards, // Por defecto
   });
 
   int? get age {
@@ -30,4 +34,25 @@ class VantageUser {
   }
 
   String get fullName => '$firstName ${lastName ?? ''}'.trim();
+
+  VantageUser copyWith({
+    String? firstName,
+    String? lastName,
+    DateTime? birthDate,
+    String? jobTitle,
+    double? monthlySavingsGoal,
+    DashboardStyle? dashboardStyle,
+  }) {
+    return VantageUser(
+      id: id,
+      email: email,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      birthDate: birthDate ?? this.birthDate,
+      jobTitle: jobTitle ?? this.jobTitle,
+      photoUrl: photoUrl,
+      monthlySavingsGoal: monthlySavingsGoal ?? this.monthlySavingsGoal,
+      dashboardStyle: dashboardStyle ?? this.dashboardStyle,
+    );
+  }
 }

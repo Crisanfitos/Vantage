@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/api/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
+import 'features/dashboard/presentation/dashboard_view.dart';
 import 'features/context_engine/presentation/context_settings_screen.dart';
 
 void main() async {
@@ -44,7 +45,7 @@ class AuthGate extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     return authState.when(
-      data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
+      data: (user) => user != null ? const VantageDashboard() : const LoginScreen(),
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, trace) => Scaffold(body: Center(child: Text('Error de Auth: $e'))),
     );

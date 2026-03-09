@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/environment.dart';
 
-class EnvironmentNotifier extends StateNotifier<List<VantageEnvironment>> {
-  EnvironmentNotifier() : super([]);
+class EnvironmentsNotifier extends Notifier<List<VantageEnvironment>> {
+  @override
+  List<VantageEnvironment> build() {
+    return []; // Estado inicial
+  }
 
   void addEnvironment(VantageEnvironment environment) {
     state = [...state, environment];
@@ -20,6 +23,6 @@ class EnvironmentNotifier extends StateNotifier<List<VantageEnvironment>> {
   }
 }
 
-final environmentsProvider = StateNotifierProvider<EnvironmentNotifier, List<VantageEnvironment>>((ref) {
-  return EnvironmentNotifier();
-});
+final environmentsProvider = NotifierProvider<EnvironmentsNotifier, List<VantageEnvironment>>(
+  EnvironmentsNotifier.new,
+);

@@ -1,28 +1,47 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+import '../../../core/api/auth_providers.dart';
+import '../../../core/api/repository_providers.dart';
 import '../domain/environment.dart';
 
-class EnvironmentsNotifier extends Notifier<List<VantageEnvironment>> {
+class EnvironmentsNotifier extends AutoDisposeNotifier<List<VantageEnvironment>> {
+  StreamSubscription? _subscription;
+
   @override
   List<VantageEnvironment> build() {
-    return []; // Estado inicial
+    // Escuchar el estado de autenticación
+    final authState = ref.watch(authStateProvider);
+    final user = authState.value;
+    
+    if (user == null) return [];
+
+    // Escuchar cambios en Firestore
+    _subscription?.cancel();
+    _subscription = ref
+        .read(environmentRepositoryProvider)
+        .watchEnvironments(user.id)
+        .listen((envs) {
+      state = envs;
+    });
+
+    ref.onDispose(() => _subscription?.cancel());
+
+    return [];
   }
 
-  void addEnvironment(VantageEnvironment environment) {
-    state = [...state, environment];
+  Future<void> addEnvironment(VantageEnvironment environment) async {
+    final user = ref.read(authStateProvider).value;
+    if (user == null) return;
+    await ref.read(environmentRepositoryProvider).saveEnvironment(user.id, environment);
   }
 
-  void removeEnvironment(String id) {
-    state = state.where((e) => e.id != id).toList();
-  }
-
-  void updateEnvironment(VantageEnvironment environment) {
-    state = [
-      for (final e in state)
-        if (e.id == environment.id) environment else e
-    ];
+  Future<void> removeEnvironment(String id) async {
+    final user = ref.read(authStateProvider).value;
+    if (user == null) return;
+    await ref.read(environmentRepositoryProvider).deleteEnvironment(user.id, id);
   }
 }
 
-final environmentsProvider = NotifierProvider<EnvironmentsNotifier, List<VantageEnvironment>>(
+final environmentsProvider = NotifierProvider.autoDispose<EnvironmentsNotifier, List<VantageEnvironment>>(
   EnvironmentsNotifier.new,
 );

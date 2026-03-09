@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'features/context_engine/presentation/context_settings_screen.dart';
 
 void main() {
-  // ProviderScope es necesario para que Riverpod funcione en toda la app
   runApp(const ProviderScope(child: VantageApp()));
 }
 
@@ -34,6 +34,19 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('VANTAGE'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_suggest),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ContextSettingsScreen()),
+              );
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -55,9 +68,9 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 40),
-            const CircularProgressIndicator(),
+            const Icon(Icons.explore_outlined, size: 60, color: Colors.deepPurpleAccent),
             const SizedBox(height: 20),
-            const Text('Inicializando cimientos...'),
+            const Text('Listo para configurar tu primer entorno.'),
           ],
         ),
       ),

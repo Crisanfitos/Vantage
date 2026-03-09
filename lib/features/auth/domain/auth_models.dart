@@ -9,7 +9,9 @@ class VantageUser {
   final String? jobTitle;
   final String? photoUrl;
   final double? monthlySavingsGoal;
-  final DashboardStyle dashboardStyle; // Nueva preferencia
+  final DashboardStyle dashboardStyle;
+  final double? salaryAmount; // Importe de nómina
+  final int? salaryDay; // Día del mes de cobro (1-31)
 
   VantageUser({
     required this.id,
@@ -20,7 +22,9 @@ class VantageUser {
     this.jobTitle,
     this.photoUrl,
     this.monthlySavingsGoal,
-    this.dashboardStyle = DashboardStyle.cards, // Por defecto
+    this.dashboardStyle = DashboardStyle.cards,
+    this.salaryAmount,
+    this.salaryDay,
   });
 
   int? get age {

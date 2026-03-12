@@ -5,6 +5,10 @@ import '../../../core/api/auth_providers.dart';
 import '../../auth/domain/auth_models.dart';
 import '../../auth/presentation/login_screen.dart';
 import '../../finance/presentation/finance_screen.dart';
+import '../../tasks/presentation/tasks_screen.dart';
+import '../../media/presentation/media_hub_screen.dart';
+import '../../github/presentation/dev_hub_screen.dart';
+import '../../context_engine/presentation/context_settings_screen.dart';
 
 class VantageDashboard extends ConsumerWidget {
   const VantageDashboard({super.key});
@@ -23,8 +27,12 @@ class VantageDashboard extends ConsumerWidget {
             title: Text('VANTAGE', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, letterSpacing: 2)),
             actions: [
               IconButton(
+                icon: const Icon(Icons.auto_fix_high_outlined), // La "Varita" para contextos
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ContextSettingsScreen())),
+              ),
+              IconButton(
                 icon: const Icon(Icons.person_outline),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProfileScreen())),
               ),
             ],
           ),
@@ -44,7 +52,6 @@ class VantageDashboard extends ConsumerWidget {
     }
   }
 
-  // --- REUTILIZAMOS LAS VISTAS DEL PROTOTIPO ---
   Widget _buildGridView(BuildContext context) {
     final modules = [
       {'name': 'Finanzas', 'icon': Icons.account_balance_wallet, 'color': Colors.teal},
@@ -63,9 +70,7 @@ class VantageDashboard extends ConsumerWidget {
         final m = modules[i];
         return InkWell(
           onTap: () {
-            if (m['name'] == 'Finanzas') {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FinanceScreen()));
-            }
+            _navigateToModule(context, m['name'] as String);
           },
           child: Container(
             decoration: BoxDecoration(
@@ -91,40 +96,54 @@ class VantageDashboard extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        InkWell(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FinanceScreen())),
-          child: _infoCard('Finanzas', 'Balance: 1.250€', 'Nómina en 5 días', Icons.euro, Colors.teal),
-        ),
-        _infoCard('Próxima Tarea', 'Revisar motor de contexto', 'Prioridad Alta', Icons.task_alt, Colors.amber),
-        _infoCard('Media', 'One Piece: Cap. 1090', 'Nuevo mañana', Icons.play_circle_outline, Colors.redAccent),
+        _infoCard(context, 'Finanzas', 'Balance: 1.250€', 'Nómina en 5 días', Icons.euro, Colors.teal),
+        _infoCard(context, 'Tareas', 'Revisar motor de contexto', 'Prioridad Alta', Icons.task_alt, Colors.amber),
+        _infoCard(context, 'GitHub', 'Vantage: 3 PRs abiertas', 'Último commit hace 2h', Icons.terminal, Colors.blue),
+        _infoCard(context, 'Media', 'One Piece: Cap. 1090', 'Nuevo mañana', Icons.play_circle_outline, Colors.redAccent),
       ],
     );
   }
 
-  Widget _infoCard(String title, String main, String sub, IconData icon, Color color) {
+  Widget _infoCard(BuildContext context, String title, String main, String sub, IconData icon, Color color) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  Text(main, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text(sub, style: const TextStyle(fontSize: 14, color: Colors.blueGrey)),
-                ],
+      child: InkWell(
+        onTap: () => _navigateToModule(context, title),
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text(main, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(sub, style: const TextStyle(fontSize: 14, color: Colors.blueGrey)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _navigateToModule(BuildContext context, String moduleName) {
+    Widget screen;
+    switch (moduleName) {
+      case 'Finanzas': screen = const FinanceScreen(); break;
+      case 'Tareas': screen = const TasksScreen(); break;
+      case 'Media': screen = const MediaHubScreen(); break;
+      case 'GitHub': screen = const DevHubScreen(); break;
+      default: return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
   Widget _buildTimelineView() {
@@ -163,7 +182,7 @@ class VantageDashboard extends ConsumerWidget {
   }
 }
 
-// --- PANTALLA DE PERFIL ---
+// --- PANTALLA DE PERFIL (Se mantiene igual) ---
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 

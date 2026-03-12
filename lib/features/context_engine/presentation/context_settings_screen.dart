@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/api/providers.dart';
 import '../domain/environment.dart';
 import 'environments_provider.dart';
+import 'environment_detail_screen.dart';
 
 class ContextSettingsScreen extends ConsumerWidget {
   const ContextSettingsScreen({super.key});
@@ -23,21 +24,30 @@ class ContextSettingsScreen extends ConsumerWidget {
           const Divider(),
           Expanded(
             child: environments.isEmpty
-                ? const Center(child: Text('Pulsa + para añadir tu ubicación actual'))
+                ? const Center(child: Text('Cargando entornos predefinidos...'))
                 : ListView.builder(
                     itemCount: environments.length,
                     itemBuilder: (context, index) {
                       final env = environments[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: _getThemeColor(env.themeType),
-                          child: Icon(_getIconData(env.iconName), color: Colors.white),
-                        ),
-                        title: Text(env.name),
-                        subtitle: Text('Radio: ${env.radiusInMeters.toInt()}m'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () => ref.read(environmentsProvider.notifier).removeEnvironment(env.id),
+                      final isConfigured = env.latitude != 0 && env.longitude != 0;
+                      
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        child: ListTile(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => EnvironmentDetailScreen(environment: env))
+                          ),
+                          leading: CircleAvatar(
+                            backgroundColor: isConfigured ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                            child: Icon(
+                              _getIconData(env.iconName), 
+                              color: isConfigured ? Colors.green : Colors.red
+                            ),
+                          ),
+                          title: Text(env.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(isConfigured ? '🟢 Configurado' : '🔴 Sin ubicación'),
+                          trailing: const Icon(Icons.chevron_right),
                         ),
                       );
                     },
@@ -47,7 +57,7 @@ class ContextSettingsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEnvironmentDialog(context, ref, locationService),
-        label: const Text('Añadir Aquí'),
+        label: const Text('Añadir Nuevo'),
         icon: const Icon(Icons.add_location_alt),
       ),
     );
@@ -55,11 +65,6 @@ class ContextSettingsScreen extends ConsumerWidget {
 
   void _showAddEnvironmentDialog(BuildContext context, WidgetRef ref, locationService) async {
     final pos = await locationService.getCurrentLocation();
-    if (pos == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error: GPS no disponible')));
-      return;
-    }
-
     final nameController = TextEditingController();
     VantageThemeType selectedTheme = VantageThemeType.midnight;
 
@@ -72,7 +77,7 @@ class ContextSettingsScreen extends ConsumerWidget {
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(labelText: 'Nombre (Ej: Casa, Trabajo)'),
+              decoration: const InputDecoration(labelText: 'Nombre (Ej: Gimnasio, Universidad)'),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<VantageThemeType>(
@@ -92,11 +97,11 @@ class ContextSettingsScreen extends ConsumerWidget {
             onPressed: () {
               if (nameController.text.isNotEmpty) {
                 final newEnv = VantageEnvironment(
-                  id: const Uuid().v4(),
+                  id: 'custom_${const Uuid().v4()}',
                   name: nameController.text,
-                  latitude: pos.latitude,
-                  longitude: pos.longitude,
-                  radiusInMeters: 100, // Valor por defecto
+                  latitude: pos?.latitude ?? 0.0,
+                  longitude: pos?.longitude ?? 0.0,
+                  radiusInMeters: 100,
                   themeType: selectedTheme,
                   iconName: 'location_on',
                 );
@@ -111,18 +116,10 @@ class ContextSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Color _getThemeColor(VantageThemeType type) {
-    switch (type) {
-      case VantageThemeType.midnight: return Colors.indigo;
-      case VantageThemeType.neon: return Colors.pinkAccent;
-      case VantageThemeType.forest: return Colors.green;
-      case VantageThemeType.sunset: return Colors.orange;
-      case VantageThemeType.ocean: return Colors.blue;
-    }
-  }
-
   IconData _getIconData(String name) {
-    return Icons.location_on; // Simplificado para el MVP
+    if (name == 'home') return Icons.home;
+    if (name == 'business_center') return Icons.business_center;
+    return Icons.location_on;
   }
 
   Widget _buildCurrentLocationStatus(locationService) {

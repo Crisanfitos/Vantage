@@ -22,6 +22,8 @@ class FirebaseAuthService implements IAuthService {
       monthlySavingsGoal: (data['monthlySavingsGoal'] as num?)?.toDouble(),
       salaryAmount: (data['salaryAmount'] as num?)?.toDouble(),
       salaryDay: data['salaryDay'] as int?,
+      actionModeId: data['actionModeId'] ?? 'suggested',
+      notificationsEnabled: data['notificationsEnabled'] ?? true,
       dashboardStyle: DashboardStyle.values.firstWhere(
         (e) => e.name == data['dashboardStyle'],
         orElse: () => DashboardStyle.cards,

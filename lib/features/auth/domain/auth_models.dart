@@ -12,6 +12,8 @@ class VantageUser {
   final DashboardStyle dashboardStyle;
   final double? salaryAmount; // Importe de nómina
   final int? salaryDay; // Día del mes de cobro (1-31)
+  final String actionModeId; // FK a ContextActionMode (manual, suggested, automatic)
+  final bool notificationsEnabled; // Notificaciones de cambio de entorno
 
   VantageUser({
     required this.id,
@@ -25,6 +27,8 @@ class VantageUser {
     this.dashboardStyle = DashboardStyle.cards,
     this.salaryAmount,
     this.salaryDay,
+    this.actionModeId = 'suggested', // Por defecto Sugerido
+    this.notificationsEnabled = true,
   });
 
   int? get age {

@@ -222,7 +222,36 @@ class ProfileScreen extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 40),
+              const Text('Inteligencia Contextual', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('¿Cómo debe reaccionar Vantage al detectar un cambio de lugar?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: user.actionModeId,
+                decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12)),
+                items: const [
+                  DropdownMenuItem(value: 'manual', child: Text('Manual (Solo avisar)')),
+                  DropdownMenuItem(value: 'suggested', child: Text('Sugerido (Preguntar)')),
+                  DropdownMenuItem(value: 'automatic', child: Text('Automático (Cambiar solo)')),
+                ],
+                onChanged: (val) async {
+                  if (val != null) {
+                    await ref.read(authServiceProvider).updateUserPreference(user.id, {'actionModeId': val});
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text('Notificaciones de Entorno'),
+                subtitle: const Text('Avisar al entrar o salir de un lugar guardado'),
+                value: user.notificationsEnabled,
+                onChanged: (val) async {
+                  await ref.read(authServiceProvider).updateUserPreference(user.id, {'notificationsEnabled': val});
+                },
+              ),
+              const SizedBox(height: 40),
               ElevatedButton.icon(
+
                 icon: const Icon(Icons.logout),
                 label: const Text('Cerrar Sesión'),
                 onPressed: () {

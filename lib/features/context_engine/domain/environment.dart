@@ -12,9 +12,13 @@ class VantageEnvironment {
   final double latitude;
   final double longitude;
   final double radiusInMeters;
-  final VantageThemeType themeType;
   final String iconName;
   final String? imagePath;
+  
+  // Nuevos campos de personalización
+  final int colorSeedValue; // Color ARGB para el tema
+  final String? preferredDashboardStyle; // grid, cards, timeline
+  final List<String> visibleModules; // ['finance', 'tasks', 'github', 'media', 'notes']
 
   VantageEnvironment({
     required this.id,
@@ -22,20 +26,23 @@ class VantageEnvironment {
     required this.latitude,
     required this.longitude,
     required this.radiusInMeters,
-    required this.themeType,
     required this.iconName,
     this.imagePath,
+    this.colorSeedValue = 0xFF673AB7, // Purple por defecto
+    this.preferredDashboardStyle,
+    this.visibleModules = const ['finance', 'tasks', 'github', 'media', 'notes'],
   });
 
-  // Copia con cambios (útil para el gestor de estado)
   VantageEnvironment copyWith({
     String? name,
     double? latitude,
     double? longitude,
     double? radiusInMeters,
-    VantageThemeType? themeType,
     String? iconName,
     String? imagePath,
+    int? colorSeedValue,
+    String? preferredDashboardStyle,
+    List<String>? visibleModules,
   }) {
     return VantageEnvironment(
       id: id,
@@ -43,9 +50,11 @@ class VantageEnvironment {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       radiusInMeters: radiusInMeters ?? this.radiusInMeters,
-      themeType: themeType ?? this.themeType,
       iconName: iconName ?? this.iconName,
       imagePath: imagePath ?? this.imagePath,
+      colorSeedValue: colorSeedValue ?? this.colorSeedValue,
+      preferredDashboardStyle: preferredDashboardStyle ?? this.preferredDashboardStyle,
+      visibleModules: visibleModules ?? this.visibleModules,
     );
   }
 }

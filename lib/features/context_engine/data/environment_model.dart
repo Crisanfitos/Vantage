@@ -7,9 +7,11 @@ class EnvironmentModel extends VantageEnvironment {
     required super.latitude,
     required super.longitude,
     required super.radiusInMeters,
-    required super.themeType,
     required super.iconName,
     super.imagePath,
+    super.colorSeedValue,
+    super.preferredDashboardStyle,
+    super.visibleModules,
   });
 
   factory EnvironmentModel.fromEntity(VantageEnvironment entity) {
@@ -19,9 +21,11 @@ class EnvironmentModel extends VantageEnvironment {
       latitude: entity.latitude,
       longitude: entity.longitude,
       radiusInMeters: entity.radiusInMeters,
-      themeType: entity.themeType,
       iconName: entity.iconName,
       imagePath: entity.imagePath,
+      colorSeedValue: entity.colorSeedValue,
+      preferredDashboardStyle: entity.preferredDashboardStyle,
+      visibleModules: entity.visibleModules,
     );
   }
 
@@ -32,12 +36,11 @@ class EnvironmentModel extends VantageEnvironment {
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       radiusInMeters: (json['radius'] as num).toDouble(),
-      themeType: VantageThemeType.values.firstWhere(
-        (e) => e.name == json['themeType'],
-        orElse: () => VantageThemeType.midnight,
-      ),
       iconName: json['iconName'] ?? 'location_on',
       imagePath: json['imagePath'],
+      colorSeedValue: json['colorSeedValue'] ?? 0xFF673AB7,
+      preferredDashboardStyle: json['preferredDashboardStyle'],
+      visibleModules: List<String>.from(json['visibleModules'] ?? ['finance', 'tasks', 'github', 'media', 'notes']),
     );
   }
 
@@ -47,9 +50,11 @@ class EnvironmentModel extends VantageEnvironment {
       'latitude': latitude,
       'longitude': longitude,
       'radius': radiusInMeters,
-      'themeType': themeType.name,
       'iconName': iconName,
       'imagePath': imagePath,
+      'colorSeedValue': colorSeedValue,
+      'preferredDashboardStyle': preferredDashboardStyle,
+      'visibleModules': visibleModules,
     };
   }
 }

@@ -66,7 +66,6 @@ class ContextSettingsScreen extends ConsumerWidget {
   void _showAddEnvironmentDialog(BuildContext context, WidgetRef ref, locationService) async {
     final pos = await locationService.getCurrentLocation();
     final nameController = TextEditingController();
-    VantageThemeType selectedTheme = VantageThemeType.midnight;
 
     showDialog(
       context: context,
@@ -78,16 +77,6 @@ class ContextSettingsScreen extends ConsumerWidget {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(labelText: 'Nombre (Ej: Gimnasio, Universidad)'),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<VantageThemeType>(
-              value: selectedTheme,
-              decoration: const InputDecoration(labelText: 'Tema Visual'),
-              items: VantageThemeType.values.map((t) => DropdownMenuItem(
-                value: t,
-                child: Text(t.name.toUpperCase()),
-              )).toList(),
-              onChanged: (v) => selectedTheme = v!,
             ),
           ],
         ),
@@ -102,7 +91,6 @@ class ContextSettingsScreen extends ConsumerWidget {
                   latitude: pos?.latitude ?? 0.0,
                   longitude: pos?.longitude ?? 0.0,
                   radiusInMeters: 100,
-                  themeType: selectedTheme,
                   iconName: 'location_on',
                 );
                 ref.read(environmentsProvider.notifier).addEnvironment(newEnv);

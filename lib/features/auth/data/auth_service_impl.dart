@@ -73,6 +73,9 @@ class FirebaseAuthService implements IAuthService {
         'latitude': 0.0,
         'longitude': 0.0,
         'radius': 20.0,
+        'colorSeedValue': 0xFF4CAF50, // Verde para casa
+        'preferredDashboardStyle': 'cards',
+        'visibleModules': ['finance', 'tasks', 'media', 'notes'],
       },
       {
         'id': 'work_${DateTime.now().millisecondsSinceEpoch}',
@@ -81,6 +84,9 @@ class FirebaseAuthService implements IAuthService {
         'latitude': 0.0,
         'longitude': 0.0,
         'radius': 20.0,
+        'colorSeedValue': 0xFF2196F3, // Azul para trabajo
+        'preferredDashboardStyle': 'grid',
+        'visibleModules': ['tasks', 'github', 'notes'],
       },
     ];
 

@@ -61,6 +61,36 @@ class FirebaseAuthService implements IAuthService {
     };
 
     await _firestore.collection('users').doc(uid).set(userData);
+
+    // Crear entornos por defecto
+    final defaultEnvs = [
+      {
+        'id': 'home_${DateTime.now().millisecondsSinceEpoch}',
+        'name': 'Casa',
+        'iconName': 'home',
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'radius': 20.0,
+      },
+      {
+        'id': 'work_${DateTime.now().millisecondsSinceEpoch}',
+        'name': 'Trabajo',
+        'iconName': 'business_center',
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'radius': 20.0,
+      },
+    ];
+
+    for (var env in defaultEnvs) {
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('environments')
+          .doc(env['id'] as String)
+          .set(env);
+    }
+
     return await _getUserFromFirestore(uid, email);
   }
 
@@ -76,11 +106,21 @@ class FirebaseAuthService implements IAuthService {
   Future<void> deleteAccount() async {
     final user = _auth.currentUser;
     if (user != null) {
-      await _firestore.collection('users').doc(user.uid).delete();
-      final envs = await _firestore.collection('users').doc(user.uid).collection('environments').get();
-      for (var doc in envs.docs) {
-        await doc.reference.delete();
+      final uid = user.uid;
+      
+      // 1. Eliminar sub-colecciones (Firestore no las borra automáticamente al borrar el doc padre)
+      final subCollections = ['environments', 'finance_records', 'recurring_templates', 'tasks'];
+      for (final coll in subCollections) {
+        final docs = await _firestore.collection('users').doc(uid).collection(coll).get();
+        for (final doc in docs.docs) {
+          await doc.reference.delete();
+        }
       }
+
+      // 2. Eliminar documento principal del usuario
+      await _firestore.collection('users').doc(uid).delete();
+      
+      // 3. Eliminar usuario de Firebase Auth
       await user.delete();
     }
   }
@@ -104,6 +144,8 @@ class FirebaseAuthService implements IAuthService {
         jobTitle: data['jobTitle'],
         photoUrl: data['photoUrl'],
         monthlySavingsGoal: (data['monthlySavingsGoal'] as num?)?.toDouble(),
+        salaryAmount: (data['salaryAmount'] as num?)?.toDouble(),
+        salaryDay: data['salaryDay'] as int?,
         dashboardStyle: DashboardStyle.values.firstWhere(
           (e) => e.name == data['dashboardStyle'],
           orElse: () => DashboardStyle.cards,

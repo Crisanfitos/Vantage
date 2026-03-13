@@ -18,8 +18,17 @@ class _EnvironmentDetailScreenState extends ConsumerState<EnvironmentDetailScree
   late TextEditingController _latController;
   late TextEditingController _lngController;
   late double _radius;
+  late List<String> _visibleModules;
   bool _isManualMode = false;
   bool _isGettingLocation = false;
+
+  final Map<String, String> _moduleNames = {
+    'finance': 'Finanzas',
+    'tasks': 'Tareas',
+    'github': 'DevHub (GitHub)',
+    'media': 'Media Hub',
+    'notes': 'Notas Contextuales',
+  };
 
   @override
   void initState() {
@@ -32,12 +41,12 @@ class _EnvironmentDetailScreenState extends ConsumerState<EnvironmentDetailScree
       text: widget.environment.longitude != 0 ? widget.environment.longitude.toString() : ''
     );
     _radius = widget.environment.radiusInMeters;
+    _visibleModules = List.from(widget.environment.visibleModules);
   }
 
   Future<void> _getCurrentLocation() async {
     if (_isGettingLocation) return;
     setState(() => _isGettingLocation = true);
-    
     final locationService = ref.read(locationServiceProvider);
     try {
       final pos = await locationService.getCurrentLocation();
@@ -47,11 +56,6 @@ class _EnvironmentDetailScreenState extends ConsumerState<EnvironmentDetailScree
           _lngController.text = pos.longitude.toString();
           _isManualMode = true; 
         });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ubicación capturada con éxito'))
-          );
-        }
       }
     } finally {
       if (mounted) setState(() => _isGettingLocation = false);
@@ -67,6 +71,7 @@ class _EnvironmentDetailScreenState extends ConsumerState<EnvironmentDetailScree
       radiusInMeters: _radius,
       latitude: lat,
       longitude: lng,
+      visibleModules: _visibleModules,
     );
     
     await ref.read(environmentsProvider.notifier).addEnvironment(updated);
@@ -84,124 +89,75 @@ class _EnvironmentDetailScreenState extends ConsumerState<EnvironmentDetailScree
         children: [
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Nombre del Entorno', 
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.edit_location_alt),
-            ),
+            decoration: const InputDecoration(labelText: 'Nombre', border: OutlineInputBorder()),
           ),
           const SizedBox(height: 32),
-          
           _buildStatusHeader(hasLocation),
-          
           const SizedBox(height: 24),
           
           if (!_isManualMode && !hasLocation)
             ElevatedButton.icon(
               onPressed: _isGettingLocation ? null : _getCurrentLocation,
               icon: _isGettingLocation 
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70))
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.my_location),
               label: Text(_isGettingLocation ? 'CALCULANDO...' : 'OBTENER UBICACIÓN ACTUAL'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-                backgroundColor: Colors.deepPurpleAccent.withOpacity(_isGettingLocation ? 0.4 : 1.0),
-                foregroundColor: Colors.white,
-              ),
             )
           else ...[
             Row(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _latController,
-                    decoration: const InputDecoration(
-                      labelText: 'Latitud', 
-                      hintText: 'Ej: 40.4167',
-                      border: OutlineInputBorder()
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                ),
+                Expanded(child: TextField(controller: _latController, decoration: const InputDecoration(labelText: 'Latitud', border: OutlineInputBorder()))),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _lngController,
-                    decoration: const InputDecoration(
-                      labelText: 'Longitud', 
-                      hintText: 'Ej: -3.7033',
-                      border: OutlineInputBorder()
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                ),
+                Expanded(child: TextField(controller: _lngController, decoration: const InputDecoration(labelText: 'Longitud', border: OutlineInputBorder()))),
               ],
-            ),
-            TextButton.icon(
-              onPressed: _isGettingLocation ? null : _getCurrentLocation,
-              icon: _isGettingLocation 
-                ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.refresh, size: 16),
-              label: const Text('Recalcular con GPS'),
             ),
           ],
 
           const SizedBox(height: 32),
-          const Divider(),
-          const SizedBox(height: 16),
-          
-          Text('Radio de detección: ${_radius.toInt()} metros', 
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const Text('Define qué tan cerca debes estar para activar este modo.', 
-            style: TextStyle(fontSize: 12, color: Colors.grey)),
+          const Text('Módulos Visibles en este Entorno', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Marca qué quieres ver cuando estés aquí.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+          const SizedBox(height: 12),
+          ..._moduleNames.entries.map((entry) => CheckboxListTile(
+            title: Text(entry.value),
+            value: _visibleModules.contains(entry.key),
+            onChanged: (val) {
+              setState(() {
+                if (val == true) {
+                  _visibleModules.add(entry.key);
+                } else {
+                  _visibleModules.remove(entry.key);
+                }
+              });
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            dense: true,
+          )),
+
+          const SizedBox(height: 32),
+          Text('Radio de detección: ${_radius.toInt()}m', style: const TextStyle(fontWeight: FontWeight.bold)),
           Slider(
-            value: _radius,
-            min: 10,
-            max: 100,
-            divisions: 9,
-            label: '${_radius.toInt()}m',
+            value: _radius, min: 10, max: 100, divisions: 9,
             onChanged: (v) => setState(() => _radius = v),
           ),
           
           const SizedBox(height: 48),
           ElevatedButton(
             onPressed: _save,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
-            ),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(20)),
             child: const Text('GUARDAR CONFIGURACIÓN', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-          
-          if (hasLocation || _isManualMode)
-            Center(
-              child: TextButton(
-                onPressed: () => setState(() => _isManualMode = !_isManualMode),
-                child: Text(_isManualMode ? 'Ocultar campos manuales' : 'Editar coordenadas manualmente'),
-              ),
-            ),
         ],
       ),
     );
   }
 
   Widget _buildStatusHeader(bool hasLocation) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          hasLocation ? Icons.location_on : Icons.location_off, 
-          color: hasLocation ? Colors.greenAccent : Colors.redAccent, 
-          size: 48
-        ),
-        const SizedBox(height: 8),
-        Text(
-          hasLocation ? 'LISTO PARA DETECTAR' : 'UBICACIÓN PENDIENTE',
-          style: TextStyle(
-            fontWeight: FontWeight.bold, 
-            color: hasLocation ? Colors.greenAccent : Colors.redAccent,
-            letterSpacing: 1.1
-          ),
-        ),
+        Icon(hasLocation ? Icons.location_on : Icons.location_off, color: hasLocation ? Colors.greenAccent : Colors.redAccent),
+        const SizedBox(width: 8),
+        Text(hasLocation ? 'LISTO' : 'PENDIENTE', style: TextStyle(fontWeight: FontWeight.bold, color: hasLocation ? Colors.greenAccent : Colors.redAccent)),
       ],
     );
   }

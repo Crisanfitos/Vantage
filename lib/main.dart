@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'core/api/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
@@ -11,6 +12,11 @@ import 'features/context_engine/presentation/context_watcher_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("Advertencia: No se pudo cargar el archivo .env");
+  }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -26,34 +32,43 @@ class VantageApp extends StatelessWidget {
       title: 'Vantage',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true,
+        brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
           brightness: Brightness.dark,
         ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        useMaterial3: true,
       ),
-      home: const AuthGate(),
+      builder: (context, child) {
+        return Consumer(
+          builder: (context, ref, _) {
+            // Activamos el vigilante de contexto
+            ref.watch(contextWatcherProvider);
+            
+            // Usamos el overlay pasando el child que viene de MaterialApp
+            return ContextBannerOverlay(child: child ?? const SizedBox());
+          },
+        );
+      },
+      home: const AuthWrapper(),
     );
   }
 }
 
-class AuthGate extends ConsumerWidget {
-  const AuthGate({super.key});
+class AuthWrapper extends ConsumerWidget {
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    
-    // Activa el vigilante de contexto
-    ref.watch(contextWatcherProvider);
 
     return authState.when(
-      data: (user) => user != null 
-        ? const ContextBannerOverlay(child: VantageDashboard()) 
-        : const LoginScreen(),
+      data: (user) {
+        if (user != null) return const VantageDashboard();
+        return const LoginScreen();
+      },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, trace) => Scaffold(body: Center(child: Text('Error de Auth: $e'))),
+      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
     );
   }
 }

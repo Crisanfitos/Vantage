@@ -55,3 +55,7 @@ ios/Runner/GoogleService-Info.plist
 # Project documentation
 Documentacion/
 
+
+# Environment variables
+.env
+
